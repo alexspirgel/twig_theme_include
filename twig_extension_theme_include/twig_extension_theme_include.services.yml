@@ -1,0 +1,7 @@
+services:
+  # [module-folder-name].[module-class-name]
+  twig_extension_theme_include.Theme_Include_Twig_Extension:
+    # Drupal\[module-folder-name].[module-class-name]
+    class: Drupal\twig_extension_theme_include\Theme_Include_Twig_Extension
+    tags:
+      - { name: twig.extension }
