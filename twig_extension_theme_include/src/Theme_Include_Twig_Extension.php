@@ -17,8 +17,8 @@ class Theme_Include_Twig_Extension extends \Twig_Extension {
 
 	public function theme_include(\Twig_Environment $env, $context, $template, $variables = array(), $withContext = true, $ignoreMissing = false, $sandboxed = false) {
 
-		// Initiate an array of the active and parent themes.
-		$active_themes = array();
+		// Initialize an array of the active and parent themes.
+		$active_themes = [];
 
 		// Get the active theme.
 		$active_theme = \Drupal::service('theme.manager')->getActiveTheme();
