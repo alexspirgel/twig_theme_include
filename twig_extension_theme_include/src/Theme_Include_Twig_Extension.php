@@ -2,6 +2,7 @@
 
 namespace Drupal\twig_extension_theme_include;
 
+// Create a class that extends Twig_Extension, allowing us to add our own extension.
 class Theme_Include_Twig_Extension extends \Twig_Extension {
 
 	public function getName() {
@@ -10,11 +11,12 @@ class Theme_Include_Twig_Extension extends \Twig_Extension {
 
 	public function getFunctions() {
 		return array(
-			// Create a custom twig function with all the options the default twig include requires.
+			// Create a custom Twig function with all the options default Twig include requires.
 			new \Twig_SimpleFunction('theme_include', [$this, 'theme_include'], array('needs_environment' => true, 'needs_context' => true, 'is_safe' => array('all')))
 		);
 	}
 
+	// Checks for the existence of a file within a specific theme.
 	public function file_exists_in_theme($file_path, $theme) {
 		// Get the path to the theme.
 		$theme_path = $theme->getPath();
@@ -32,10 +34,11 @@ class Theme_Include_Twig_Extension extends \Twig_Extension {
 		}
 	}
 
+	// Returns a call of Twig include with the first file found at a specified path, working up the theme tree.
 	public function theme_include(\Twig_Environment $env, $context, $template, $variables = array(), $withContext = true, $ignoreMissing = false, $sandboxed = false) {
-
 		// Get the active theme.
 		$active_theme = \Drupal::service('theme.manager')->getActiveTheme();
+		
 		// If the file exists in the active theme.
 		if($active_theme_file_path = $this->file_exists_in_theme($template, $active_theme)) {
 			// Call Twig include with the active theme file path.
@@ -59,7 +62,6 @@ class Theme_Include_Twig_Extension extends \Twig_Extension {
 		$active_theme_path = $active_theme->getPath() . '/' . $template;
 		// No active theme has the file, but we pass the path into the twig include as if the file existed in the active theme directory (let the core twig function handle it).
 		return twig_include($env, $context, $active_theme_path, $variables, $withContext, $ignoreMissing, $sandboxed);
-
 	}
 
 }
