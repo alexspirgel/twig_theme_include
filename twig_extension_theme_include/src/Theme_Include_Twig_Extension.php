@@ -15,15 +15,32 @@ class Theme_Include_Twig_Extension extends \Twig_Extension {
 		);
 	}
 
-	public function theme_include(\Twig_Environment $env, $context, $template, $variables = array(), $withContext = true, $ignoreMissing = false, $sandboxed = false) {
+	public function file_exists_in_theme($file_path, $theme) {
+		// Get the path to the theme.
+		$theme_path = $theme->getPath();
+		// Build the path to the file in the theme.
+		$theme_file_path = $theme_path . '/' . $file_path;
+		// If the file exists in the theme.
+		if(file_exists($theme_file_path)) {
+			// Return the path to the file in the theme.
+			return $theme_file_path;
+		}
+		// If the file does not exist in the theme.
+		else {
+			// Return false.
+			return false;
+		}
+	}
 
-		// Initialize an array of the active and parent themes.
-		$active_themes = [];
+	public function theme_include(\Twig_Environment $env, $context, $template, $variables = array(), $withContext = true, $ignoreMissing = false, $sandboxed = false) {
 
 		// Get the active theme.
 		$active_theme = \Drupal::service('theme.manager')->getActiveTheme();
-		// Append the active theme to the array of all active themes (including parents).
-		array_push($active_themes, $active_theme);
+		// If the file exists in the active theme.
+		if($active_theme_file_path = $this->file_exists_in_theme($template, $active_theme)) {
+			// Call Twig include with the active theme file path.
+			return twig_include($env, $context, $active_theme_file_path, $variables, $withContext, $ignoreMissing, $sandboxed);
+		}
 
 		// Set a variable to hold the current theme as we loop through. Set initially to the active theme.
 		$loop_theme = $active_theme;
@@ -31,22 +48,10 @@ class Theme_Include_Twig_Extension extends \Twig_Extension {
 		while($loop_theme->getBaseThemes()) {
 			// Set the loop theme to the base theme.
 			$loop_theme = array_shift(array_values($loop_theme->getBaseThemes()));
-			// Add the base theme to the array of active themes.
-			array_push($active_themes, $loop_theme);
-		}
-
-		// For each item in array.
-		for($i = 0; $i < count($active_themes); $i++) {
-			// Set the theme to a variable.
-			$current_theme = $active_themes[$i];
-			// Get the path to the current theme.
-			$theme_path = $current_theme->getPath();
-			// Build the path to the file in the current theme.
-			$theme_file_path = $theme_path . '/' . $template;
-			// If the file exists in the current theme.
-			if(file_exists($theme_file_path)) {
-				// Call the default twig include function.
-				return twig_include($env, $context, $theme_file_path, $variables, $withContext, $ignoreMissing, $sandboxed);
+			// If the file exists in the loop theme.
+			if($loop_theme_file_path = $this->file_exists_in_theme($template, $loop_theme)) {
+				// Call Twig include with the loop theme file path.
+				return twig_include($env, $context, $loop_theme_file_path, $variables, $withContext, $ignoreMissing, $sandboxed);
 			}
 		}
 
