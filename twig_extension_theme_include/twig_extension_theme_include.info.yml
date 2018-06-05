@@ -1,5 +1,5 @@
 name: Twig Extension Theme Include
 description: Extends Twig core with a custom include function for proper file overrides when working with sub themes.
-package: Custom
+package: Twig
 type: module
 core: 8.x
